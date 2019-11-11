@@ -36,20 +36,21 @@ with torch.no_grad():
     for i, batch in enumerate(valid_loader):
         src, trg, length = batch
         src = src.to(device)
-        # trg = trg.to(device)
-        print(src)
-        src_mask, trg_mask = make_mask(src, result_sentence)
-        print(src_mask, trg_mask)
+        trg = trg.to(device)
+        print(src, trg)
+        src_mask, trg_mask = make_mask(src, trg)
+        print(src_mask)
         enc_src = encoder(src, src_mask)
         print(enc_src.shape)
-        result_sentence = [1]
+        result_sentence = torch.tensor([[1]])
+        print(result_sentence)
         while True:
             src_mask, trg_mask = make_mask(src, result_sentence)
             temp_output = decoder(result_sentence, enc_src, trg_mask, src_mask)
             print(temp_output)
             if temp_output[-1] == 2:
                 break
-            result_sentence.append(temp_output)
+            result_sentence.data[0].append(temp_output)
         print(result_sentence)
         # src_text, tgt_text = 1, 2
         # src_text = sequence_to_text(src_text, src_idx2char)
