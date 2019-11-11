@@ -35,6 +35,7 @@ valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1, collate_
                                            shuffle=True, num_workers=1)
 
 with torch.no_grad():
+    print(len(valid_loader))
     for i, batch in enumerate(valid_loader):
         src, trg, length = batch
         src = src.to(device)
@@ -50,13 +51,13 @@ with torch.no_grad():
             src_mask, trg_mask = make_mask(src, result_sentence)
             temp_output = decoder(result_sentence, enc_src, trg_mask, src_mask)
             print(temp_output.reshape(-1))
-            temp_vocab = np.argmax(temp_output.reshape(-1))
+            temp_vocab = np.argmax(temp_output.reshape(-1).cpu())
             print(temp_vocab)
             if temp_vocab == 2:
                 break
             result_sentence.data[0].append(temp_vocab)
             time.sleep(100)
-        print('result', result_sentence)
+        print(i, 'result', result_sentence)
         # src_text, tgt_text = 1, 2
         # src_text = sequence_to_text(src_text, src_idx2char)
         # src_text = ' '.join(src_text)
