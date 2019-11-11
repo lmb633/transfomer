@@ -25,7 +25,7 @@ def train():
 
     model = Seq2Seq(encoder, decoder, pad_idx, device).to(device)
 
-    train_dataset = AiChallenger2017Dataset('train')
+    train_dataset = AiChallenger2017Dataset('valid')
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, collate_fn=pad_collate,
                                                shuffle=True, num_workers=num_workers)
     valid_dataset = AiChallenger2017Dataset('valid')
@@ -41,12 +41,13 @@ def train():
     criteriaon = nn.CrossEntropyLoss(ignore_index=pad_idx)
 
     for i in range(epoch):
-        train_epoch(model, train_dataset, optimizer, criteriaon)
+        train_epoch(model, train_loader, optimizer, criteriaon)
 
 
 def train_epoch(model, train_dataset, optimizer, criteriaon):
     model.train()
     for i, (batch) in enumerate(train_dataset):
+        print(batch)
         src, tgt, length = batch
         print(batch)
         src = src.to(device)
@@ -54,3 +55,6 @@ def train_epoch(model, train_dataset, optimizer, criteriaon):
         length = length.to(device)
         optimizer.optimizer.zero_grad()
         output = model(src, tgt)
+
+
+train()
