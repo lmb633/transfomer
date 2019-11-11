@@ -87,7 +87,7 @@ def main():
     print('src_text: ' + src_text)
 
     tgt_text = sequence_to_text(tgt_text, tgt_idx2char)
-    tgt_text = ''.join(tgt_text)
+    tgt_text = ' '.join(tgt_text)
     print('tgt_text: ' + tgt_text)
 
 
