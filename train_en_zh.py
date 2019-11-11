@@ -5,9 +5,9 @@ from data_gen import AiChallenger2017Dataset, data, pad_collate
 import time
 import os
 
-batch_size = 1
+batch_size = 256
 num_workers = 4
-epoch = 1
+epoch = 100
 clip = 1
 print_freq = 100
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -28,19 +28,21 @@ def train():
     epochs_since_improvement = 0
 
     if os.path.exists(checkpoint_path):
+        print('load checkpoint...')
         checkpoint = torch.load(checkpoint_path)
         start_epoch = checkpoint['epoch'] + 1
         model = checkpoint['model']
         epochs_since_improvement = checkpoint['epochs_since_improvement']
         optimizer = checkpoint['optimizer']
     else:
+        print('train from begining...')
         encoder = Encoder(vocab_size, hid_dim, n_layers, n_heads, pf_dim, EncoderLayer, SelfAttention, PositionwiseFeedforward, drop_out, device)
         decoder = Decoder(vocab_size, hid_dim, n_layers, n_heads, pf_dim, DecoderLayer, SelfAttention, PositionwiseFeedforward, drop_out, device)
 
         model = Seq2Seq(encoder, decoder, pad_idx, device).to(device)
         optimizer = NoamOpt(hid_dim, 1, 2000, torch.optim.Adam(model.parameters()))
 
-    train_dataset = AiChallenger2017Dataset('valid')
+    train_dataset = AiChallenger2017Dataset('train')
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, collate_fn=pad_collate,
                                                shuffle=True, num_workers=num_workers)
     valid_dataset = AiChallenger2017Dataset('valid')
@@ -85,7 +87,6 @@ def train_epoch(model, train_loader, optimizer, criteriaon):
         avg_loss = epoch_loss / (i + 1)
         if i % print_freq == 0:
             print('{}/{} avg loss'.format(i, len(train_loader)), avg_loss)
-        time.sleep(100)
     return avg_loss
 
 
