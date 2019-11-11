@@ -2,6 +2,8 @@ import pickle
 import os
 import torch
 from data_gen import AiChallenger2017Dataset, pad_collate
+import numpy as np
+import time
 
 
 def sequence_to_text(seq, idx2char):
@@ -42,16 +44,19 @@ with torch.no_grad():
         print(src_mask)
         enc_src = encoder(src, src_mask)
         print(enc_src.shape)
-        result_sentence = torch.tensor([[1]])
+        result_sentence = torch.tensor([[1]]).to(device)
         print(result_sentence)
         while True:
             src_mask, trg_mask = make_mask(src, result_sentence)
             temp_output = decoder(result_sentence, enc_src, trg_mask, src_mask)
-            print(temp_output)
-            if temp_output[-1] == 2:
+            print(temp_output.reshape(-1))
+            temp_vocab = np.argmax(temp_output.reshape(-1))
+            print(temp_vocab)
+            if temp_vocab == 2:
                 break
-            result_sentence.data[0].append(temp_output)
-        print(result_sentence)
+            result_sentence.data[0].append(temp_vocab)
+            time.sleep(100)
+        print('result', result_sentence)
         # src_text, tgt_text = 1, 2
         # src_text = sequence_to_text(src_text, src_idx2char)
         # src_text = ' '.join(src_text)
