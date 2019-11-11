@@ -2,10 +2,13 @@ import torch
 from torch import nn
 from model import Seq2Seq, Decoder, Encoder, EncoderLayer, DecoderLayer, SelfAttention, PositionwiseFeedforward, NoamOpt
 from data_gen import AiChallenger2017Dataset, data, pad_collate
+import time
 
-batch_size = 128
+batch_size = 1
 num_workers = 4
 epoch = 1
+clip = 1
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 pad_idx = 0
 vocab_size = 15000
@@ -14,9 +17,6 @@ n_layers = 6
 n_heads = 8
 pf_dim = 2048
 drop_out = 0.1
-
-clip = 1
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def train():
@@ -46,15 +46,28 @@ def train():
 
 def train_epoch(model, train_dataset, optimizer, criteriaon):
     model.train()
+    epoch_loss = 0
     for i, (batch) in enumerate(train_dataset):
-        print(batch)
+        print(batch.shape)
         src, tgt, length = batch
-        print(batch)
         src = src.to(device)
         tgt = tgt.to(device)
         length = length.to(device)
         optimizer.optimizer.zero_grad()
         output = model(src, tgt)
+        print(output.shape)
+        output = output.contiguous().view(-1, output.shape[-1])
+        print(output.shape)
+        tgt = tgt[:, 1:].contiguous().view(-1)
+        loss = criteriaon(output, tgt)
+        loss.backward()
+        nn.utils.clip_grad_norm_(model.parameters(), clip)
+        optimizer.step()
+        epoch_loss += loss.item()
+        avg_loss = epoch_loss / len(train_dataset)
+        print('avg loss', avg_loss)
+        time.sleep(100)
+    return avg_loss
 
 
 train()

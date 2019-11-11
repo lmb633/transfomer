@@ -7,7 +7,7 @@ from torch.utils.data.dataloader import default_collate
 
 data_file = 'data.pkl'
 vocab_file = 'vocab.pkl'
-IGNORE_ID = -1
+IGNORE_ID = 0
 pad_id = 0
 print('loading samples...')
 start = time.time()
