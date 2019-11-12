@@ -10,6 +10,8 @@ num_workers = 4
 epoch = 100
 clip = 1
 print_freq = 100
+torch.cuda.set_device(1)
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 pad_idx = 0

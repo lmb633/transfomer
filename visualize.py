@@ -58,11 +58,19 @@ with torch.no_grad():
             result_sentence.data[0].append(temp_vocab)
             time.sleep(100)
         print(i, 'result', result_sentence)
-        # src_text, tgt_text = 1, 2
-        # src_text = sequence_to_text(src_text, src_idx2char)
-        # src_text = ' '.join(src_text)
-        # print('src_text: ' + src_text)
-        #
-        # tgt_text = sequence_to_text(tgt_text, tgt_idx2char)
-        # tgt_text = ' '.join(tgt_text)
-        # print('tgt_text: ' + tgt_text)
+
+        src_text = src
+        tgt_text = trg
+        result_text = result_sentence[1:]
+
+        src_text = sequence_to_text(src_text, src_idx2char)
+        src_text = ' '.join(src_text)
+        print('src_text: ' + src_text)
+
+        tgt_text = sequence_to_text(tgt_text, tgt_idx2char)
+        tgt_text = ' '.join(tgt_text)
+        print('tgt_text: ' + tgt_text)
+
+        result_text = sequence_to_text(result_text, tgt_idx2char)
+        result_text = ' '.join(result_text)
+        print('tgt_text: ' + result_text)
