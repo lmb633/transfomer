@@ -55,8 +55,10 @@ with torch.no_grad():
             print(temp_vocab)
             if temp_vocab == 2:
                 break
-            result_sentence.data[0].append(temp_vocab)
-            time.sleep(100)
+            temp = result_sentence.tolist()
+            temp.append([temp_vocab])
+            result_sentence = torch.tensor(temp)
+            print(result_sentence)
         print(i, 'result', result_sentence)
 
         src_text = src
